@@ -1,6 +1,10 @@
 /* Written by Ye Liu */
 
-// Mapbox-GL library access token
-const ACCESS_TOKEN = 'pk.eyJ1IjoiZ2Fydm94IiwiYSI6ImNseHZucnRpcDB4Y3EycXNkNjRuM3drNWsifQ.V5lH9roOpH9a6Jphwybprw';
+// Mapbox-GL library access token — set REACT_APP_MAPBOX_TOKEN in your .env file
+const ACCESS_TOKEN = process.env.REACT_APP_MAPBOX_TOKEN;
+
+if (!ACCESS_TOKEN) {
+    console.error('REACT_APP_MAPBOX_TOKEN is not set. Please add it to your .env file.');
+}
 
 export { ACCESS_TOKEN };

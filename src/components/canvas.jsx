@@ -69,16 +69,14 @@ class Canvas extends React.Component {
     }
 
     removeTempLayer = () => {
-        const layers = this.state.map.getStyle().layers;
-        this.setState({
-            map: null
-        })
-        layers.map(layer => {
+        const map = this.state.map;
+        if (!map) return;
+        const layers = map.getStyle().layers;
+        layers.forEach(layer => {
             if (layer.id === 'custom-temp-point') {
-                this.state.map.removeLayer('custom-temp-point');
-                this.state.map.removeSource('custom-temp-point');
+                map.removeLayer('custom-temp-point');
+                map.removeSource('custom-temp-point');
             }
-            return true;
         });
 
         if (this.state.popup && this.state.popup.isOpen()) {
@@ -249,8 +247,6 @@ class Canvas extends React.Component {
 	    // Guarda las fuentes y los layers visibles actuales
 	    const currentSources = { ...this.state.map.getStyle().sources };
 	    const currentLayers = [...this.state.map.getStyle().layers];
-	    console.log(currentSources);
-	    console.log(currentLayers);
 	    // Cambia el estilo del mapa
 	    this.state.map.setStyle(mapStyles[e]);
 
@@ -264,8 +260,6 @@ class Canvas extends React.Component {
 		        } catch (error) {
 		            console.error(`Error adding source ${sourceId}:`, error);
 		        }
-		    } else {
-		        console.log(`Source with id "${sourceId}" already exists`);
 		    }
 		});
 
@@ -277,8 +271,6 @@ class Canvas extends React.Component {
 		        } catch (error) {
 		            console.error(`Error adding layer ${layer.id}:`, error);
 		        }
-		    } else {
-		        console.log(`Layer with id "${layer.id}" already exists`);
 		    }
 		});
 	    });
@@ -417,40 +409,38 @@ class Canvas extends React.Component {
     };
 
     handleURLMoved = (movedURL) => {
-        console.log('Received moved data:', movedURL);
-        // Aquí puedes hacer algo con los datos, como establecer el estado
-        this.setState({ url: movedURL[0] });
-        console.log(movedURL[2]);
-        // Emitir el evento con el nombre de la capa y la URL
+        const tileUrl = movedURL[0];
+        const layerId = movedURL[2];
+        const polygon = movedURL[3];
+
+        this.setState({ url: tileUrl });
+
+        // Emit new layer event for the layer controller
         emitter.emit('newLayer', {
-            id: movedURL[2],  // Nombre de la capa
-            url: movedURL[0],  // URL del mapa
+            id: layerId,
+            url: tileUrl,
             visible: true,
             transparency: 100
         });
-        console.log(movedURL)
-        emitter.emit('showSnackbar', 'success', `The layer '${this.splitAssetName(movedURL[2])}' has been loaded`);
+
+        emitter.emit('showSnackbar', 'success', `The layer '${this.splitAssetName(layerId)}' has been loaded`);
+
         this.state.map.addLayer({
-            'id': movedURL[2],
+            'id': layerId,
             'type': 'raster',
             'source': {
                 'type': 'raster',
-                'tiles': [
-                    this.state.url
-                ],
+                'tiles': [tileUrl],
                 'tileSize': 256
             },
             'paint': {
-                'raster-opacity': 0.8  // Opacidad de la capa de ráster
+                'raster-opacity': 0.8
             }
         });
-        const polygon = movedURL[3]; // Asumiendo que contiene el GeoJSON
+
         if (polygon && polygon.type === 'Polygon') {
-            this.flyToGeometry(this.state.map, polygon)
-        } else {
-            console.error('Invalid GeoJSON Polygon in movedURL[3]');
+            this.flyToGeometry(this.state.map, polygon);
         }
-        console.log(this.state.url);
     };
     
     componentWillUnmount() {

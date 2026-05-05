@@ -14,16 +14,16 @@ import LayerController from '@components/controllers/layerController';
 import Canvas from '@components/canvas';
 import Popup from '@components/popup';
 import '@styles/materialize.min.style.css';
-import RusleController from '../components/controllers/rusleController';
-import SocController from '../components/controllers/socController'
-import BushEncroacher from '../components/controllers/bushEncoracherController';
-import SearchController from '../components/controllers/searchContoller';
-import IllnessController from '../components/controllers/illnessController';
-import DitwinController from '../components/controllers/diTwinController';
-import DataController from '../components/controllers/dataController';
-import SyncController from '../components/controllers/syncController';
-import ModelController from '../components/controllers/modelController';
-import ImportController from '../components/controllers/importController'
+import RusleController from '@components/controllers/rusleController';
+import SocController from '@components/controllers/socController';
+import BushEncroacher from '@components/controllers/bushEncoracherController';
+import SearchController from '@components/controllers/searchContoller';
+import IllnessController from '@components/controllers/illnessController';
+import DitwinController from '@components/controllers/diTwinController';
+import DataController from '@components/controllers/dataController';
+import SyncController from '@components/controllers/syncController';
+import ModelController from '@components/controllers/modelController';
+import ImportController from '@components/controllers/importController';
 
 class Main extends React.Component {
     render() {

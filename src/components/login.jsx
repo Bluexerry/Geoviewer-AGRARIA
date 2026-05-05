@@ -18,8 +18,10 @@ import emitter from '@utils/events.utils';
 import axios from "axios";
 
 
-axios.defaults.baseURL = 'http://localhost:5000';  // Asegúrate de que la URL base es correcta
-axios.defaults.withCredentials = true; // Importante para enviar cookies
+const apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+
+axios.defaults.baseURL = apiUrl;
+axios.defaults.withCredentials = true;
 
 const theme = createTheme({
     palette: {
@@ -31,15 +33,11 @@ const theme = createTheme({
 
 const catastralList = ["41046A010000100000DU","41041A014001860000HF","41041A014001790000HQ", "41041A015002920000HF", "41041A015002760000HH", "41041A015002730000HS", "41041A014000920000HF", "41041A007003790000HK", "41041A005000430000HO"];
 
-const apiUrl = 'http://localhost:5000';
-
-
 axios.interceptors.request.use(
     config => {
       const { origin } = new URL(config.url);
-      const allowedOrigins = [apiUrl];
       const token = localStorage.getItem('token');
-      if (allowedOrigins.includes(origin)) {
+      if (origin === new URL(apiUrl).origin) {
         config.headers.authorization = `Bearer ${token}`;
       }
       return config;
@@ -121,9 +119,8 @@ class Login extends React.Component {
 
     handleChangeForm = (e) => {
         this.setState({
-            mode: this.state.mode === 'login' ? 'Login' : 'Register'
+            mode: this.state.mode === 'login' ? 'register' : 'login'
         });
-        console.log(this.state.mode)
     }
 
     handleChangeAutoComplete = (e, newValue) => {
@@ -135,10 +132,9 @@ class Login extends React.Component {
 
     getUserParcels = async (userId) => {
         try {
-            const response = await axios.get(`http://localhost:5000/users/${userId}/parcels`);
+            const response = await axios.get(`${apiUrl}/users/${userId}/parcels`);
             if (response.status === 200) {
                 this.updateDatasetUtilsFile(response.data);
-                console.log("Parcelas recibidas:", response.data);
             } else {
                 console.error("No se pudieron obtener las parcelas:", response.statusText);
             }
@@ -156,9 +152,7 @@ class Login extends React.Component {
 
         this.setState({
             datasets: datasets
-        })
-    
-        console.log("Updated datasets:", this.state.datasets);
+        });
 
         emitter.emit('moveDataset', this.state.datasets);
     }    
@@ -174,7 +168,7 @@ class Login extends React.Component {
           };
         // Generate request parameters
         const response = await axios.post(
-            "http://localhost:5000/login",
+            `${apiUrl}/login`,
             newUser
           );
 
@@ -200,20 +194,13 @@ class Login extends React.Component {
                 logining: false,
                 idUser: userID
             });
-
-            console.log(localStorage.getItem('token'))
-
-        }else{
-
         }
     }
 
 
     moveDataset = () => {
-        var datos = this.state.datasets
+        const datos = this.state.datasets;
         this.setState({ movedData: datos });
-        console.log(this.state.movedData)
-
     }
 
     componentDidMount() {

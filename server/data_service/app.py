@@ -1,7 +1,8 @@
 import random
+import os
 from flask import Flask, jsonify, request, make_response
 import subprocess
-from flask_cors import CORS  # Importa CORS
+from flask_cors import CORS
 import pandas as pd
 import psycopg2
 import json
@@ -17,10 +18,9 @@ from Crypto.Hash import HMAC
 from Crypto.Hash import SHA256
 from datetime import datetime
 
-apiURI = 'https://api.fieldclimate.com/v2'
-# HMAC Authentication credentials
-publicKey = '7b831b6ed349787c3f0e69bb63206abd74bedf3aeea5cf41'
-privateKey = '7266006455f0f4ef0cd9a160e6f02e74c5fcc0590c4fe7e1'
+apiURI = os.environ.get('FIELDCLIMATE_API_URI', 'https://api.fieldclimate.com/v2')
+publicKey = os.environ.get('FIELDCLIMATE_PUBLIC_KEY', '')
+privateKey = os.environ.get('FIELDCLIMATE_PRIVATE_KEY', '')
 
 class AuthHmacMetos(AuthBase):
     # Creates HMAC authorization header for Metos REST service GET request.
@@ -40,10 +40,19 @@ class AuthHmacMetos(AuthBase):
         return request
 
 app = Flask(__name__)
-CORS(app) 
+_cors_origins = os.environ.get('CORS_ORIGINS', 'http://localhost:3000').split(',')
+CORS(app, origins=_cors_origins)
 
+_db_params = {
+    'dbname': os.environ.get('DB_NAME', 'tepro'),
+    'user': os.environ.get('DB_USER', 'postgres'),
+    'password': os.environ.get('DB_PASSWORD', ''),
+    'host': os.environ.get('DB_HOST', 'localhost'),
+    'port': os.environ.get('DB_PORT', '5432'),
+}
 
-# Separar las características y la variable objetivo
+def get_db_conn():
+    return psycopg2.connect(**_db_params)
 
 
 
@@ -140,7 +149,7 @@ def run_script():
         apiURI = 'https://api.fieldclimate.com/v2'
         publicKey = '7b831b6ed349787c3f0e69bb63206abd74bedf3aeea5cf41'
         privateKey = '7266006455f0f4ef0cd9a160e6f02e74c5fcc0590c4fe7e1'
-        conn = psycopg2.connect(dbname="tepro", user="postgres", password="postgres")
+        conn = get_db_conn()
         cur = conn.cursor()   
 
         cur.execute("SELECT extraction_date FROM metadata ORDER BY extraction_date DESC LIMIT 1")
@@ -303,7 +312,7 @@ def run_script():
 
 @app.route('/data', methods=['POST'])
 def handle_data_request():
-    conn = psycopg2.connect(dbname="tepro", user="postgres", password="postgres")
+    conn = get_db_conn()
     cur = conn.cursor()  
     data = request.get_json()
     category = data.get('category')
@@ -343,7 +352,7 @@ def handle_data_request():
 @app.route('/precipitaciones', methods=['GET'])
 def precipitaciones():
     try:
-        conn = psycopg2.connect(dbname="tepro", user="postgres", password="postgres")
+        conn = get_db_conn()
         cur = conn.cursor()  
         query = "SELECT sampling_date, measurement_value FROM sensores WHERE measurement='Precipitation'"
 
@@ -371,7 +380,7 @@ def illness_model():
             return jsonify({"error": "No illnesses selected"}), 400
 
         # Configuración de la conexión a la base de datos
-        conn = psycopg2.connect(dbname="tepro", user="postgres", password="postgres")
+        conn = get_db_conn()
 
         # Mapeo de enfermedades y columnas
         illness_mapping = {
@@ -424,7 +433,7 @@ def illness_model():
 def available_illnesses():
     try:
         # Conexión a la base de datos
-        conn = psycopg2.connect(dbname="tepro", user="postgres", password="postgres")
+        conn = get_db_conn()
         cur = conn.cursor()
 
         # Lista de tablas y nombres de enfermedades
@@ -460,7 +469,7 @@ def available_illnesses():
 @app.route('/temperatura', methods=['GET'])
 def temperatura():
     try:
-        conn = psycopg2.connect(dbname="tepro", user="postgres", password="postgres")
+        conn = get_db_conn()
         cur = conn.cursor()  
         query = "SELECT sampling_date, measurement_value FROM sensores WHERE measurement='HC Air temperature'"
 
@@ -475,7 +484,7 @@ def temperatura():
     
 @app.route('/dataTypes/<equipment_type>', methods=['GET'])
 def get_data_types(equipment_type):
-    conn = psycopg2.connect(dbname="tepro", user="postgres", password="postgres")
+    conn = get_db_conn()
     cur = conn.cursor()
     if equipment_type.lower() == 'cameras':
         query = "SELECT DISTINCT insect_type FROM camaras"
@@ -519,7 +528,7 @@ def upload_file():
         engine = create_engine('postgresql://postgres:postgres@localhost:5432/tepro')
         
         # Validar que las columnas del archivo coincidan con las de la tabla seleccionada
-        conn = psycopg2.connect(dbname="tepro", user="postgres", password="postgres")
+        conn = get_db_conn()
         cur = conn.cursor()
         cur.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name = '{table_name}'")
         columns = [row[0] for row in cur.fetchall()]
@@ -536,7 +545,7 @@ def upload_file():
 @app.route('/api/tables', methods=['GET'])
 def list_tables():
     try:
-        conn = psycopg2.connect(dbname="tepro", user="postgres", password="postgres")
+        conn = get_db_conn()
         cur = conn.cursor()
         cur.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='public'")
         tables = cur.fetchall()
