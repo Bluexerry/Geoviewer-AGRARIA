@@ -16,7 +16,6 @@ from sqlalchemy import create_engine
 from requests.auth import AuthBase
 from Crypto.Hash import HMAC
 from Crypto.Hash import SHA256
-from datetime import datetime
 
 apiURI = os.environ.get('FIELDCLIMATE_API_URI', 'https://api.fieldclimate.com/v2')
 publicKey = os.environ.get('FIELDCLIMATE_PUBLIC_KEY', '')
@@ -503,10 +502,6 @@ def get_data_types(equipment_type):
         cur.close()
         conn.close()
 
-from flask import request, jsonify
-import pandas as pd
-import io
-
 @app.route('/api/upload', methods=['POST'])
 def upload_file():
     if 'file' not in request.files or 'table' not in request.form:
@@ -524,13 +519,28 @@ def upload_file():
         else:
             return jsonify({"error": "Unsupported file format"}), 400
 
-        # Usar SQLAlchemy para la conexión a PostgreSQL
-        engine = create_engine('postgresql://postgres:postgres@localhost:5432/tepro')
-        
+        # Whitelist table names to prevent SQL injection
+        allowed_tables = {'sensors', 'metadata', 'insectos', 'parcelas'}
+        if table_name not in allowed_tables:
+            return jsonify({"error": "Invalid table name"}), 400
+
+        # Usar SQLAlchemy para la conexión a PostgreSQL desde variables de entorno
+        db_url = (
+            f"postgresql://{os.environ.get('DB_USER', 'postgres')}:"
+            f"{os.environ.get('DB_PASSWORD', '')}@"
+            f"{os.environ.get('DB_HOST', 'localhost')}:"
+            f"{os.environ.get('DB_PORT', '5432')}/"
+            f"{os.environ.get('DB_NAME', 'tepro')}"
+        )
+        engine = create_engine(db_url)
+
         # Validar que las columnas del archivo coincidan con las de la tabla seleccionada
         conn = get_db_conn()
         cur = conn.cursor()
-        cur.execute(f"SELECT column_name FROM information_schema.columns WHERE table_name = '{table_name}'")
+        cur.execute(
+            "SELECT column_name FROM information_schema.columns WHERE table_name = %s",
+            (table_name,)
+        )
         columns = [row[0] for row in cur.fetchall()]
         if not all(item in df.columns for item in columns):
             return jsonify({"error": "File columns do not match table columns"}), 400
@@ -539,7 +549,6 @@ def upload_file():
         df.to_sql(name=table_name, con=engine, if_exists='append', index=False)
         return jsonify({"success": "Data uploaded successfully"}), 200
     except Exception as e:
-        print(e)
         return jsonify({"error": str(e)}), 500
       
 @app.route('/api/tables', methods=['GET'])
@@ -551,7 +560,6 @@ def list_tables():
         tables = cur.fetchall()
         return jsonify([table[0] for table in tables]), 200
     except Exception as e:
-        print(e)
         return jsonify({"error": str(e)}), 500
     finally:
         cur.close()
@@ -561,4 +569,4 @@ def list_tables():
     
  #HC Air temperature   
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5003)
+    app.run(host='0.0.0.0', port=5002)

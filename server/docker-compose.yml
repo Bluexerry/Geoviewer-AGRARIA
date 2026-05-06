@@ -25,6 +25,7 @@ services:
 
   earth-engine-service:
     build: ./earth_engine_service
+    env_file: ./earth_engine_service/.env
     ports:
       - "5004:5004"
     networks:

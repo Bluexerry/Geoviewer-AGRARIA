@@ -17,12 +17,16 @@ from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.preprocessing import StandardScaler
 
+# Base directory of this service — used to build robust file paths
+_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 app = Flask(__name__)
-CORS(app, supports_credentials=True, origins=["http://localhost:3000"])
+_cors_origins = os.environ.get('CORS_ORIGINS', 'http://localhost:3000').split(',')
+CORS(app, supports_credentials=True, origins=_cors_origins)
 ria = RIA()
 np.random.seed(42)
 
-result=pd.read_csv('server\earth_engine_service\lmond_test_final_agraria.csv', sep=';')
+result = pd.read_csv(os.path.join(_BASE_DIR, 'lmond_test_final_agraria.csv'), sep=';')
 X = result.drop(columns=['RENDIMIENTO(t PEPITA/ha)'])
 y = result['RENDIMIENTO(t PEPITA/ha)']
 variables_a_eliminar = ['Evaporation', 'Precipitation_Sum', 'Precipitation_mean']
@@ -36,8 +40,11 @@ X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3, 
 linear_model = LinearRegression()
 linear_model.fit(X_train, y_train)
 
-ee.Authenticate(auth_mode="gcloud")
-ee.Initialize(project='soil-values-predictor')
+try:
+    ee.Authenticate(auth_mode="gcloud")
+    ee.Initialize(project=os.environ.get('GEE_PROJECT', 'soil-values-predictor'))
+except Exception as _ee_err:
+    print(f"[WARNING] Google Earth Engine authentication failed: {_ee_err}")
 
 @app.route('/api/', methods=['GET'])
 def index():
@@ -235,7 +242,7 @@ def watsat():
             vi_values.append(Vi)
 
         # Cargar datos de humedad
-        humedad_data = pd.read_excel('server\earth_engine_service\hum.xlsx')
+        humedad_data = pd.read_excel(os.path.join(_BASE_DIR, 'hum.xlsx'))
         humedad_data['Fecha'] = pd.to_datetime(humedad_data['Fecha / Hora'])
         humedad_data['Mes'] = humedad_data['Fecha'].dt.to_period('M')
         humedad_mensual_porcentaje = humedad_data.set_index('Mes')['promedio']
@@ -276,7 +283,7 @@ def predict():
         user_data = np.array([riego_aportado, ufn, ufp, ufk])
 
         # Definir fechas y cargar shapefile
-        shapefile_path = 'server\earth_engine_service\parcela_random.shp'
+        shapefile_path = os.path.join(_BASE_DIR, 'parcela_random.shp')
         gdf = gpd.read_file(shapefile_path)
         bounds = gdf.unary_union.bounds
         roi = ee.Geometry.Rectangle([bounds[0], bounds[1], bounds[2], bounds[3]])

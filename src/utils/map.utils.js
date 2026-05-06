@@ -25,7 +25,6 @@ const buildHeatmapStyle = (color) => {
 }
 
 const buildPolygonStyle = (color) => {
-    console.log(color)
     const polygon = {
         'fill-color': '#f08',
         'fill-opacity': 0.4    
