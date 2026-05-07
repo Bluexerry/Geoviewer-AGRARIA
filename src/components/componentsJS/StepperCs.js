@@ -58,9 +58,7 @@ export default function HorizontalLinearStepperCS({onSubmit}) {
       try {
           const response = await fetch(`${apiUrl}${queryParams}`);
           const data = await response.json();
-          console.log(data['geojson'])
           setFormData({geojson: data['geojson']});
-          console.log(formData)
           onSubmit([formData, data['geojson']])
       } catch (error) {
           console.error("Error fetching data: ", error);

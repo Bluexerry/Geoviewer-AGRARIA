@@ -256,7 +256,7 @@ class SyncController extends React.Component {
                         },
                     })
                     .then(response => response.json())
-                    .then(data => {console.log(data)
+                    .then(data => {
                         this.setState({
                             loading:false
                         })

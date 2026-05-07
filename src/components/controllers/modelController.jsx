@@ -54,12 +54,12 @@ class ModelController extends React.Component {
             this.setState({ open: false });
         });
 
-        this.updatePointListener = emitter.addListener('updatePoint', (data) => {
-            console.log('Actualización de punto recibida:', data);
+        this.updatePointListener = emitter.addListener('updatePoint', (_data) => {
+            // handle point update if needed
         });
 
         this.addPointListener = emitter.addListener('addPoint', () => {
-            console.log('Agregar punto activado');
+            // handle add point if needed
         });
     }
 
@@ -80,14 +80,13 @@ class ModelController extends React.Component {
         })
             .then(response => response.json())
             .then(data => {
-                console.log(data); // Verifica los datos recibidos
                 this.setState({
                     data,
                     loading: false
                 });
             })
             .catch(error => {
-                console.error('Error al obtener datos:', error);
+                console.error('Error al obtener datos de watsat:', error);
             });
     };
 

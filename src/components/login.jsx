@@ -125,9 +125,7 @@ class Login extends React.Component {
 
     handleChangeAutoComplete = (e, newValue) => {
         const updatedReferences = newValue.map(option => option.reference);
-        this.setState({ selectedOptions: updatedReferences }, () => {
-            console.log(this.state.selectedOptions);  // This will now output the updated state
-          });
+        this.setState({ selectedOptions: updatedReferences });
     };
 
     getUserParcels = async (userId) => {

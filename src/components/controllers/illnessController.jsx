@@ -54,11 +54,10 @@ class IllnessController extends React.Component {
             .then(response => response.json())
             .then(result => {
                 if (result.success) {
-                    console.log(result)
                     this.setState({ data: result.data, loading: false });
                 }
             })
-            .catch(error => console.error('Error fetching data:', error));
+            .catch(error => console.error('Error fetching illness model data:', error));
     }
 
     componentWillUnmount() {

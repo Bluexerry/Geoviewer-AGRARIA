@@ -129,11 +129,9 @@ export default function HorizontalLinearStepperData({ onSubmit }) {
 
   const processPlotData = (data) => {
     const traces = formData.dataTypes.map((dataType) => {
-    console.log(dataType)
     const filteredData = data
       .filter((item) => item.measurement === dataType)
-      .sort((a, b) => new Date(a.sampling_date) - new Date(b.sampling_date)); // Ordenar por fecha
-      console.log(filteredData)
+      .sort((a, b) => new Date(a.sampling_date) - new Date(b.sampling_date));
       return {
         type: 'scatter',
         mode: 'lines',
@@ -165,7 +163,6 @@ export default function HorizontalLinearStepperData({ onSubmit }) {
 
       if (result && result.data) {
         const data = JSON.parse(result.data);
-        console.log(data)
         processPlotData(data);
       }
     } catch (error) {

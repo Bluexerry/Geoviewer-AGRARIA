@@ -31,7 +31,6 @@ function CadastralSearch({ onSubmit }) {
         try {
             const response = await fetch(`${apiUrl}${queryParams}`);
             const data = await response.json();
-            console.log(data)
             onSubmit(data.output);    
             setResult(data.parcelInfo);
             setShowResults(true);

@@ -74,3 +74,31 @@ typings/
 
 # FuseBox cache
 .fusebox/
+
+# ─── Build output ───────────────────────────────────────────────────────────
+build/
+dist/
+
+# ─── Python ─────────────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyc
+env_site/
+*/venv/
+*/myenv/
+*.egg-info/
+
+# ─── Data / test files (not source code) ────────────────────────────────────
+*.xlsx
+*.zip
+result.*
+
+# ─── Google Cloud service account credentials ───────────────────────────────
+*-credentials.json
+soil-values-predictor-*.json
+
+# ─── IDE / OS artifacts ─────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+~/

@@ -443,17 +443,12 @@ class DitwinController extends React.Component {
 
     handleDataSubmit = (data) => {
         this.setState({capa: data})
-        console.log("Datos recibidos en SearchController:", data);
         emitter.emit('moveCapa', this.state.capa);
-        // Puedes manejar los datos como desees aquí
     };
 
     moveCapa = () => {
         var capa = this.state.capa
         this.setState({ movedCapa: capa });
-        console.log(this.state.movedCapa)
-        console.log(typeof this.state.movedCapa)
-
     }
 
 

@@ -75,20 +75,15 @@ def get_cadastral_data(ref):
         add=''
         if recinto_num:
             add += f",{recinto_num}"
-        print(f"{base_info_url}{id_info}"+add)
         info_response = requests.get(f"{base_info_url}{id_info}"+add)
         info_response.raise_for_status()
         info_data = info_response.json()
         parts = id_geojson.split('/')
-        print(f"{geojson_url}{id_geojson}.geojson")
-
-        # Seleccionar los trozos primero, segundo, quinto y sexto
         selected_parts = [parts[0], parts[1], parts[4], parts[5]]
 
         # Quitar ceros a la izquierda
         cleaned_parts = [int(part) for part in selected_parts]
         
-        print(info_data)
         # Enviamos la lista en el cuerpo de la solicitud
         response = get_boundaries(cleaned_parts, int(recinto_num))
         
@@ -110,7 +105,6 @@ def get_cadastral_data(ref):
 def get_boundaries(numbers, recinto_num):
     
 # Extraemos la lista enviada
-    print(numbers)
 # Realizamos alguna operación con la lista (ejemplo: convertir a enteros)
     table=  None
     if(numbers[0]==41):
@@ -130,8 +124,6 @@ def get_boundaries(numbers, recinto_num):
     if(numbers[0]==29):      
         table = ee.FeatureCollection('users/jbravo/sigpac/SP24_REC_29') 
 
-    print((numbers))
-    
     cd_prov = ee.Number(numbers[0]).int()
     cd_mun = ee.Number(numbers[1]).int()
     cd_pol = ee.Number(numbers[2]).int()
@@ -150,12 +142,6 @@ def get_boundaries(numbers, recinto_num):
     )
 
     polygon_count = filtered_polygon.size().getInfo()
-    if polygon_count == 0:
-        print("No se encontraron polígonos con los criterios especificados.")
-    elif polygon_count > 1:
-        print(f"Se encontraron {polygon_count} polígonos. Ajusta los filtros para ser más específico.")
-    else:
-        print(f"Se encontró {polygon_count} polígono.")
     
     erosion_viz_params = {'min': 0, 'max': 10, 'palette': ['#490eff', '#12f4ff', '#12ff50', '#e5ff12', '#ff4812']}
 
@@ -406,7 +392,6 @@ def predict():
 
         return jsonify({'prediction': response}), 200
     except Exception as e:
-        print(str(e))
         return jsonify({"error": str(e)}), 500
      
 @app.route('/api/rusle', methods=['POST'])
@@ -505,7 +490,6 @@ def get_rusle():
             # Generar mapa
             map_id = erosion.getMapId(erosion_viz_params) 
             bounds=aoi.geometry().getInfo()
-            print(bounds)
             return jsonify({
                 "success": True,
                 "output": [map_id['tile_fetcher'].url_format, erosion_viz_params, 'Erosion_Result', bounds]
@@ -556,7 +540,6 @@ def get_map_url():
  
         return jsonify({'map_url': [url, vis_params, asset_id]})
     except Exception as e:
-        print(str(e))
         return jsonify({'error': str(e)}), 500
     
 

@@ -52,8 +52,6 @@ export default function HorizontalLinearStepperImport({ onSubmit }) {
       const response = await fetch('http://localhost:5003/api/tables'); // Endpoint para obtener enfermedades disponibles
       const data = await response.json();
       setTables(data);
-
-      console.log(data)
     } catch (error) {
       console.error("Error fetching tables: ", error);
     }
@@ -75,7 +73,6 @@ export default function HorizontalLinearStepperImport({ onSubmit }) {
         'Content-Type': 'multipart/form-data'
       }
     }).then(response => {
-      console.log('File uploaded successfully', response.data);
       setActiveStep((prevActiveStep) => prevActiveStep + 1);
     }).catch(error => {
       console.error('Error uploading file', error);

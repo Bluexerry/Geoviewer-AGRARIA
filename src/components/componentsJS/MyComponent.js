@@ -78,7 +78,6 @@ const MyComponent = () => {
             });
 
             const result = await response.json();
-            console.log(result)
             setResult(result.prediction.prediction);
             setMetrics(result.prediction.model_metrics); // Guardar las métricas recibidas
         } catch (err) {

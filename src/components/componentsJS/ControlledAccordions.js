@@ -288,8 +288,6 @@ export default function ControlledAccordions({onSubmit}) {
         data.append(key, formData.performanceIndicators[key]);
       }
       
-      console.log(data);
-      console.log("Aqi")
       const response = await fetch('http://localhost:5004/api/soil_organic_prediction', {
          method: 'POST',
          body: data
@@ -297,7 +295,6 @@ export default function ControlledAccordions({onSubmit}) {
 
       const result = await response.json();
       if(result){
-        console.log('Data sent successfully', result);
         onSubmit(result.output);
         setLoading(false);
       }

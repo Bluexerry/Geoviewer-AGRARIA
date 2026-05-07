@@ -460,17 +460,12 @@ class SearchController extends React.Component {
 
     handleDataSubmit = (data) => {
         this.setState({url: data})
-        console.log("Datos recibidos en SearchController:", data);
         emitter.emit('moveURL', this.state.url);
-        // Puedes manejar los datos como desees aquí
     };
 
     moveCapa = () => {
         var capa = this.state.capa
         this.setState({ movedCapa: capa });
-        console.log(this.state.movedCapa)
-        console.log(typeof this.state.movedCapa)
-
     }
 
 

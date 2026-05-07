@@ -64,33 +64,21 @@ class Navigator extends React.Component {
     }
 
     handleLogoutClick = () => {
-        // Initiate request
-        // request({
-        //    url: SERVICE.logout.url,
-        //    method: SERVICE.logout.method,
-        //    successCallback: (res) => {
-                // Display snackbar
-                emitter.emit('removeAllLayer');
-                emitter.emit('removeDataset');
-                emitter.emit('removeAllDataset');
-                emitter.emit('handleDatasetRemove');
-                localStorage.removeItem('token');
-                localStorage.removeItem('jwt');
-                document.cookie.split(";").forEach(function(c) { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); });
-
-                emitter.emit('showSnackbar', 'success', 'Logout successfully.');
-                // Switch login icon
-                this.setState({
-                    token:null,
-                    loggedin: false
-                })
-            //}
-        //});
+        emitter.emit('removeAllLayer');
+        emitter.emit('removeDataset');
+        emitter.emit('removeAllDataset');
+        emitter.emit('handleDatasetRemove');
+        localStorage.removeItem('token');
+        localStorage.removeItem('jwt');
+        document.cookie.split(";").forEach(function(c) { document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); });
+        emitter.emit('showSnackbar', 'success', 'Logout successfully.');
+        this.setState({
+            token: null,
+            loggedin: false
+        });
     }
 
     handleToken = (token) => {
-        console.log('Received token:', token);
-        // Aquí puedes hacer algo con los datos, como establecer el estado
         this.setState({ token: token });
     }
 

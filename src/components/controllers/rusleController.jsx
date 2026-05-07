@@ -14,7 +14,7 @@ import emitter from '@utils/events.utils';
 import { ACCESS_TOKEN } from '@/config';
 
 import '@styles/dataController.style.css';
-import ControlledAccordions from '@components/componentsJS/ControlledAccordions__';
+import ControlledAccordions from '@components/componentsJS/ControlledAccordionsRusle';
 
 const theme = createTheme({
     palette: {
@@ -256,10 +256,8 @@ class RusleController extends React.Component {
 
     handleDataSubmit = (data) => {
         this.setState({url: data})
-        console.log("Datos recibidos en ModelController:", data);
         emitter.emit('moveURL', this.state.url);
-        // Puedes manejar los datos como desees aquí
-      };
+    };
 
     handleAddClick = () => {
         // Get GeoJSON from map
@@ -517,8 +515,6 @@ class RusleController extends React.Component {
     moveURL = () => {
         var url = this.state.url
         this.setState({ movedURL: url });
-        console.log(this.state.movedURL)
-
     }
     processTemperatureData = (data) => {
         const trace = {

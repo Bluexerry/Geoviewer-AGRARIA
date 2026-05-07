@@ -42,7 +42,6 @@ class Canvas extends React.Component {
     flyToGeometry(map, geometry) {
         const type = geometry.type;
         let coordinates;
-        console.log(geometry)
 
         if (type === 'FeatureCollection') {
             const firstFeature = geometry.features[0];
@@ -54,8 +53,6 @@ class Canvas extends React.Component {
         }
 
         if (geometry.type === 'Polygon') {
-            console.log(coordinates[0][0])
-            console.log(coordinates[0][0][1], coordinates[0][0][0])
             this.state.map.flyTo({
                 center: [coordinates[0][0][0], coordinates[0][0][1]],
                 zoom: 15

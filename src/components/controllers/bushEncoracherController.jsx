@@ -76,7 +76,6 @@ class BushEncroacher extends React.Component {
 
             // Obtener las especies disponibles
             const speciesOptions = this.getSpeciesOptions(assets);
-            console.log(assets)
             this.setState({ assets: assets, speciesOptions: speciesOptions });
         } catch (error) {
             console.error('Error fetching assets:', error);
@@ -146,19 +145,17 @@ class BushEncroacher extends React.Component {
     };
 
     parseLayerName = (name) => {
-        console.log(name)
         if (name.endsWith('_avg')) {
             const parts = name.split('_');
-            console.log(parts)
             if (parts.length === 3) {
-                return 'Current'; // e.g., "Rhigozum_trichotomum_avg" -> "Current"
+                return 'Current';
             } else if (parts.length === 5) {
                 const rcp = parts[2];
                 const year = '20' + parts[3];
-                return `RCP${rcp} ${year}`; // e.g., "Rhigozum_trichotomum_26_50_avg" -> "RCP26 2050"
+                return `RCP${rcp} ${year}`;
             }
         }
-        return name; // Si no coincide con los patrones, devolver el nombre original
+        return name;
     };
 
     fetchMapUrl = async (assetId, assetType) => {

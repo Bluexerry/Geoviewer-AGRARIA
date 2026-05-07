@@ -64,7 +64,6 @@ def fetch_data_for_sensor(sensor_id, start_date, end_date):
     if response.status_code == 200:
         return response.json()
     else:
-        print(response.json())
         return None
     
 def update_sensors(start_timestamp, end_timestamp):
@@ -226,8 +225,6 @@ def run_script():
         date_only = date_time.strftime('%Y-%m-%d')
         date_only_ = date_time_.strftime('%Y-%m-%d')
         
-        print(date_only)
-        print(date_only_)
         if date_only != date_only_:
             ria = RIA()
             estaciones = ria.obtener_datos_diarios_periodo_con_et0(41, 22,iso_format_date,iso_format_date_ )
@@ -306,7 +303,6 @@ def run_script():
         conn.close()
         return jsonify({"success": True, "output": ""}), 200
     except subprocess.CalledProcessError as e:
-        print(e)
         return jsonify({"success": False, "error": e.output.decode("utf-8")}), 500
 
 @app.route('/data', methods=['POST'])
